@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  # MySQL
+  db:
+    build:
+      context: ./
+      dockerfile: Dockerfile-mysql
+    image: jwt-mysql:1.0
+    container_name: jwt-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - "13306:3306"
