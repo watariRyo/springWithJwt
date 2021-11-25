@@ -50,7 +50,7 @@ class UserResource {
         return ResponseEntity.ok().build()
     }
 
-    @GetMapping("/token/refresh")
+    @PostMapping("/token/refresh")
     fun refreshToken(request: HttpServletRequest, response: HttpServletResponse) {
         val authorizaionHeader: String = request.getHeader(HttpHeaders.AUTHORIZATION)
         if (authorizaionHeader != null && authorizaionHeader.startsWith("Bearer ")) {

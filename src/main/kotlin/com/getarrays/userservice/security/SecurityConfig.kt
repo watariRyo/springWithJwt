@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfFilter
 
 @Configuration
@@ -32,12 +33,12 @@ class SecurityConfig @Autowired constructor(private val userRepo: UserRepo, priv
         val customAuthenticationFilter: CustomAuthenticationFilter = CustomAuthenticationFilter(authenticationManagerBean())
         customAuthenticationFilter.setFilterProcessesUrl("/api/login")
 
-        http?.csrf()?.ignoringAntMatchers("/api/login", "/logout")
-        http?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        http?.authorizeRequests()?.antMatchers("/api/login/**", "/api/token/refresh/**")?.permitAll()
-        http?.authorizeRequests()?.antMatchers(HttpMethod.GET, "/api/user/**")?.hasAuthority("ROLE_USER")
-        http?.authorizeRequests()?.antMatchers(HttpMethod.POST, "/api/user/save/**")?.hasAuthority("ROLE_ADMIN")
-        http?.authorizeRequests()?.anyRequest()?.authenticated()
+        http?.csrf()?.ignoringAntMatchers("/api/login", "/logout")?.csrfTokenRepository(CookieCsrfTokenRepository())?.
+            and()?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)?.
+            and()?.authorizeRequests()?.antMatchers("/api/login/**", "/api/token/refresh/**")?.permitAll()?.
+            and()?.authorizeRequests()?.antMatchers(HttpMethod.GET, "/api/user/**")?.hasAuthority("ROLE_USER")?.
+            and()?.authorizeRequests()?.antMatchers(HttpMethod.POST, "/api/user/save/**")?.hasAuthority("ROLE_ADMIN")?.
+            and()?.authorizeRequests()?.anyRequest()?.authenticated()
         http?.addFilter(customAuthenticationFilter)
         http?.addFilterBefore(CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter::class.java)
     }
