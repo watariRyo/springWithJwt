@@ -1,6 +1,7 @@
 package com.getarrays.userservice.security
 
 import com.getarrays.userservice.filter.CustomAuthenticationFilter
+import com.getarrays.userservice.filter.CustomAuthorizationFilter
 import com.getarrays.userservice.passwordEncoder
 import com.getarrays.userservice.repo.UserRepo
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
@@ -31,11 +33,12 @@ class SecurityConfig @Autowired constructor(private val userRepo: UserRepo, priv
 
         http?.csrf()?.disable()
         http?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        http?.authorizeRequests()?.antMatchers("/api/login/**")?.permitAll()
+        http?.authorizeRequests()?.antMatchers("/api/login/**", "/api/token/refresh/**")?.permitAll()
         http?.authorizeRequests()?.antMatchers(HttpMethod.GET, "/api/user/**")?.hasAuthority("ROLE_USER")
         http?.authorizeRequests()?.antMatchers(HttpMethod.POST, "/api/user/save/**")?.hasAuthority("ROLE_ADMIN")
         http?.authorizeRequests()?.anyRequest()?.authenticated()
         http?.addFilter(customAuthenticationFilter)
+        http?.addFilterBefore(CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter::class.java)
     }
 
     @Bean
