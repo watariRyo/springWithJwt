@@ -3,6 +3,7 @@ package com.getarrays.userservice.filter
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.getarrays.userservice.util.AuthUtil
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,9 +52,9 @@ class CustomAuthenticationFilter(private val authManager: AuthenticationManager)
             .sign(algorithm)
 //        response?.setHeader("access_token", access_token)
 //        response?.setHeader("refresh_token", refresh_token)
-        val tokens: HashMap<String, String> = hashMapOf()
-        tokens.put("access_token", access_token)
-        tokens.put("refresh_token", refresh_token)
+        val tokens: HashMap<String, String> = AuthUtil.setTokens(access_token, refresh_token)
+//        tokens.put("access_token", access_token)
+//        tokens.put("refresh_token", refresh_token)
         response?.contentType = APPLICATION_JSON_VALUE
         ObjectMapper().writeValue(response?.outputStream, tokens)
     }

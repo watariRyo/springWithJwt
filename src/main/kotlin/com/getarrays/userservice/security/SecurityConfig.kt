@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.csrf.CsrfFilter
 
 @Configuration
 @EnableWebSecurity
@@ -31,7 +32,7 @@ class SecurityConfig @Autowired constructor(private val userRepo: UserRepo, priv
         val customAuthenticationFilter: CustomAuthenticationFilter = CustomAuthenticationFilter(authenticationManagerBean())
         customAuthenticationFilter.setFilterProcessesUrl("/api/login")
 
-        http?.csrf()?.disable()
+        http?.csrf()?.ignoringAntMatchers("/api/login", "/logout")
         http?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         http?.authorizeRequests()?.antMatchers("/api/login/**", "/api/token/refresh/**")?.permitAll()
         http?.authorizeRequests()?.antMatchers(HttpMethod.GET, "/api/user/**")?.hasAuthority("ROLE_USER")
